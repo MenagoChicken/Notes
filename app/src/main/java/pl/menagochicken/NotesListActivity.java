@@ -10,6 +10,7 @@ import java.util.ArrayList;
 
 import pl.menagochicken.adapters.NotesRecyclerAdapter;
 import pl.menagochicken.models.Note;
+import pl.menagochicken.util.VerticalSpacingItemDecorator;
 
 public class NotesListActivity extends AppCompatActivity {
 
@@ -48,6 +49,8 @@ public class NotesListActivity extends AppCompatActivity {
     private void initRecyclerView(){
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(linearLayoutManager);
+        VerticalSpacingItemDecorator itemDecorator = new VerticalSpacingItemDecorator(10);
+        mRecyclerView.addItemDecoration(itemDecorator);
         mNotesRecyclerAdapter = new NotesRecyclerAdapter(mNotes);
         mRecyclerView.setAdapter(mNotesRecyclerAdapter);
     }

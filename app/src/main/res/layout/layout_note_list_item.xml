@@ -36,7 +36,8 @@
         android:layout_weight="20"
         android:id="@+id/note_timestamp"
         android:textSize="23sp"
-        android:lines="1"
+        android:layout_gravity="center_vertical"
+        android:textAlignment="center"
         android:text="Dec 2018"
         android:padding="10dp"
         />
