@@ -5,7 +5,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.widget.LinearLayout;
+import android.util.Log;
 
 import java.util.ArrayList;
 
@@ -13,11 +13,11 @@ import pl.menagochicken.adapters.NotesRecyclerAdapter;
 import pl.menagochicken.models.Note;
 import pl.menagochicken.util.VerticalSpacingItemDecorator;
 
-public class NotesListActivity extends AppCompatActivity {
+public class NotesListActivity extends AppCompatActivity implements NotesRecyclerAdapter.OnNoteListener {
 
     private static final String TAG = "NotesListActivity";
 
-    // Ui componnents
+    // Ui components
     private RecyclerView mRecyclerView;
 
     //vars
@@ -38,8 +38,8 @@ public class NotesListActivity extends AppCompatActivity {
         setTitle("Notes");
     }
 
-    private void insertFakeNotes(){
-        for (int i = 0; i < 1000 ; i++) {
+    private void insertFakeNotes() {
+        for (int i = 0; i < 1000; i++) {
             Note note = new Note();
             note.setTitle("title # " + i);
             note.setContent("content # " + i);
@@ -49,12 +49,20 @@ public class NotesListActivity extends AppCompatActivity {
         mNotesRecyclerAdapter.notifyDataSetChanged();
     }
 
-    private void initRecyclerView(){
+    private void initRecyclerView() {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(linearLayoutManager);
         VerticalSpacingItemDecorator itemDecorator = new VerticalSpacingItemDecorator(10);
         mRecyclerView.addItemDecoration(itemDecorator);
-        mNotesRecyclerAdapter = new NotesRecyclerAdapter(mNotes);
+        mNotesRecyclerAdapter = new NotesRecyclerAdapter(mNotes, this);
         mRecyclerView.setAdapter(mNotesRecyclerAdapter);
+    }
+
+
+    @Override
+    public void onNoteClick(int position) {
+
+        Log.d(TAG, "onNoteClick: clicked." + position);
+
     }
 }
