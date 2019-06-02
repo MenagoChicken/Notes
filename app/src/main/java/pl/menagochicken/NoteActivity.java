@@ -18,5 +18,9 @@ public class NoteActivity extends AppCompatActivity {
             Note note = getIntent().getParcelableExtra("selectedNote");
             Log.d(TAG, "onCreate: " + note.toString());
         }
+
+        //VIEW
+
+        //EDIT
     }
 }
