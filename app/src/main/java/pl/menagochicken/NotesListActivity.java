@@ -66,6 +66,7 @@ public class NotesListActivity extends AppCompatActivity implements NotesRecycle
         Log.d(TAG, "onNoteClick: clicked." + position);
 
         Intent intent = new Intent(this, NoteActivity.class);
+        intent.putExtra("selectedNote", mNotes.get(position));
         startActivity(intent);
 
     }
