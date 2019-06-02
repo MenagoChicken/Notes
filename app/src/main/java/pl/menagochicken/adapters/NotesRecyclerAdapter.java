@@ -50,14 +50,14 @@ public class NotesRecyclerAdapter extends RecyclerView.Adapter<NotesRecyclerAdap
             super(itemView);
             title = itemView.findViewById(R.id.note_title);
             timeStamp = itemView.findViewById(R.id.note_timestamp);
-            onNoteListener = onNoteListener;
+            this.onNoteListener = onNoteListener;
 
             itemView.setOnClickListener(this);
         }
 
 
         @Override
-        public void onClick(View v) {
+        public void onClick(View view) {
             onNoteListener.onNoteClick(getAdapterPosition());
         }
     }
