@@ -14,7 +14,7 @@ import android.widget.TextView;
 import pl.menagochicken.models.Note;
 
 public class NoteActivity extends AppCompatActivity implements View.OnTouchListener,
-        GestureDetector.OnGestureListener, GestureDetector.OnDoubleTapListener
+        GestureDetector.OnGestureListener, GestureDetector.OnDoubleTapListener, View.OnClickListener
 {
     private static final String TAG = "NoteActivity";
     private static final int EDIT_MODE_ENABLED = 1;
@@ -66,6 +66,8 @@ public class NoteActivity extends AppCompatActivity implements View.OnTouchListe
     private void setListeners(){
         mEditText.setOnTouchListener(this);
         mGestureDetector = new GestureDetector(this, this);
+        mViewTitle.setOnClickListener(this);
+        mCheck.setOnClickListener(this);
     }
 
     private boolean getIncomingIntent(){
@@ -162,5 +164,30 @@ public class NoteActivity extends AppCompatActivity implements View.OnTouchListe
     @Override
     public boolean onDoubleTapEvent(MotionEvent e) {
         return false;
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+            case R.id.toolbar_check:{
+                disabledEditMode();
+                break;
+            }
+            case R.id.note_text_title:{
+                enabledEditMode();
+                mEditTitle.requestFocus();
+                mEditTitle.setSelection(mEditTitle.length());
+                break;
+            }
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        if(mMode == EDIT_MODE_ENABLED){
+            onClick(mCheck);
+        }else {
+            super.onBackPressed();
+        }
     }
 }
