@@ -7,6 +7,8 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import pl.menagochicken.models.Note;
@@ -14,17 +16,25 @@ import pl.menagochicken.models.Note;
 public class NoteActivity extends AppCompatActivity implements View.OnTouchListener,
         GestureDetector.OnGestureListener, GestureDetector.OnDoubleTapListener
 {
+    private static final String TAG = "NoteActivity";
+    private static final int EDIT_MODE_ENABLED = 1;
+    private static final int EDIT_MODE_DISABLED = 0;
+
 
     // ui components
     private EditText mEditTitle, mEditText;
     private TextView mViewTitle;
+    private RelativeLayout mCheckContainer, mBackArrowContainer;
+    private ImageButton mCheck, mBackArrow;
 
     //vars
     private boolean mIsNewNote;
     private Note mInitialNote;
     private GestureDetector mGestureDetector;
+    private int mMode;
 
-    private static final String TAG = "NoteActivity";
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,10 +43,17 @@ public class NoteActivity extends AppCompatActivity implements View.OnTouchListe
         mEditText = findViewById(R.id.note_text);
         mEditTitle = findViewById(R.id.note_edit_title);
         mViewTitle = findViewById(R.id.note_text_title);
+        mCheckContainer = findViewById(R.id.check_container);
+        mBackArrowContainer =findViewById(R.id.back_arrow_container);
+        mCheck = findViewById(R.id.toolbar_check);
+        mBackArrow = findViewById(R.id.toolbar_back_arrow);
+
+
 
         if (getIncomingIntent()){
             //new note (EDIT MODE)
             setNewNoteProperties();
+            enabledEditMode();
         } else {
             //not new note (VIEW MODE)
             setNoteProperties();
@@ -55,11 +72,33 @@ public class NoteActivity extends AppCompatActivity implements View.OnTouchListe
         if (getIntent().hasExtra("selectedNote")){
             mInitialNote = getIntent().getParcelableExtra("selectedNote");
             Log.d(TAG, "getIncomingIntent: " + mInitialNote.toString());
+            mMode = EDIT_MODE_DISABLED;
             mIsNewNote = false;
             return false;
         }
+        mMode = EDIT_MODE_ENABLED;
         mIsNewNote = true;
         return true;
+    }
+
+    private void enabledEditMode(){
+        mBackArrowContainer.setVisibility(View.GONE);
+        mCheckContainer.setVisibility(View.VISIBLE);
+
+        mViewTitle.setVisibility(View.GONE);
+        mEditTitle.setVisibility(View.VISIBLE);
+
+        mMode = EDIT_MODE_ENABLED;
+    }
+
+    private void disabledEditMode(){
+        mBackArrowContainer.setVisibility(View.VISIBLE);
+        mCheckContainer.setVisibility(View.GONE);
+
+        mViewTitle.setVisibility(View.VISIBLE);
+        mEditTitle.setVisibility(View.GONE);
+
+        mMode = EDIT_MODE_DISABLED;
     }
 
     private void setNoteProperties(){
@@ -116,6 +155,7 @@ public class NoteActivity extends AppCompatActivity implements View.OnTouchListe
     @Override
     public boolean onDoubleTap(MotionEvent e) {
         Log.d(TAG, "onDoubleTap: double tapped");
+        enabledEditMode();
         return false;
     }
 
