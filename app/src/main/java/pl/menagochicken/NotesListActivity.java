@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.appcompat.widget.Toolbar;
@@ -12,9 +13,11 @@ import android.util.Log;
 import android.view.View;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import pl.menagochicken.adapters.NotesRecyclerAdapter;
 import pl.menagochicken.models.Note;
+import pl.menagochicken.persistance.NoteRepository;
 import pl.menagochicken.util.VerticalSpacingItemDecorator;
 
 public class NotesListActivity extends AppCompatActivity implements NotesRecyclerAdapter.OnNoteListener,
@@ -28,6 +31,7 @@ public class NotesListActivity extends AppCompatActivity implements NotesRecycle
     //vars
     private ArrayList<Note> mNotes = new ArrayList<>();
     private NotesRecyclerAdapter mNotesRecyclerAdapter;
+    private NoteRepository mNoteRepository;
 
 
     @Override
@@ -38,11 +42,29 @@ public class NotesListActivity extends AppCompatActivity implements NotesRecycle
 
         findViewById(R.id.fab).setOnClickListener(this);
 
+        mNoteRepository = new NoteRepository(this);
+
         initRecyclerView();
-        insertFakeNotes();
+        retrieveNotes();
+//        insertFakeNotes();
 
         setSupportActionBar((Toolbar) findViewById(R.id.notesToolbar));
         setTitle("Notes");
+    }
+
+    private void retrieveNotes(){
+        mNoteRepository.retriveNoteTask().observe(this, new Observer<List<Note>>() {
+            @Override
+            public void onChanged(List<Note> notes) {
+                if (mNotes.size() > 0){
+                    mNotes.clear();
+                }
+                if (notes != null){
+                    mNotes.addAll(notes);
+                }
+                mNotesRecyclerAdapter.notifyDataSetChanged();
+            }
+        });
     }
 
     private void insertFakeNotes() {
