@@ -53,7 +53,7 @@ public class NotesListActivity extends AppCompatActivity implements NotesRecycle
     }
 
     private void retrieveNotes(){
-        mNoteRepository.retriveNoteTask().observe(this, new Observer<List<Note>>() {
+        mNoteRepository.retrieveNoteTask().observe(this, new Observer<List<Note>>() {
             @Override
             public void onChanged(List<Note> notes) {
                 if (mNotes.size() > 0){

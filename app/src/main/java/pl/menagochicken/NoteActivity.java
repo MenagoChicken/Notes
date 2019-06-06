@@ -1,7 +1,6 @@
 package pl.menagochicken;
 
 import android.app.Activity;
-import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.GestureDetector;
@@ -13,11 +12,13 @@ import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import pl.menagochicken.models.Note;
+import pl.menagochicken.persistance.NoteRepository;
 
 public class NoteActivity extends AppCompatActivity implements View.OnTouchListener,
-        GestureDetector.OnGestureListener, GestureDetector.OnDoubleTapListener, View.OnClickListener
-{
+        GestureDetector.OnGestureListener, GestureDetector.OnDoubleTapListener, View.OnClickListener {
     private static final String TAG = "NoteActivity";
     private static final int EDIT_MODE_ENABLED = 1;
     private static final int EDIT_MODE_DISABLED = 0;
@@ -34,7 +35,7 @@ public class NoteActivity extends AppCompatActivity implements View.OnTouchListe
     private Note mInitialNote;
     private GestureDetector mGestureDetector;
     private int mMode;
-
+    private NoteRepository mNoteRepository;
 
 
     @Override
@@ -46,13 +47,13 @@ public class NoteActivity extends AppCompatActivity implements View.OnTouchListe
         mEditTitle = findViewById(R.id.note_edit_title);
         mViewTitle = findViewById(R.id.note_text_title);
         mCheckContainer = findViewById(R.id.check_container);
-        mBackArrowContainer =findViewById(R.id.back_arrow_container);
+        mBackArrowContainer = findViewById(R.id.back_arrow_container);
         mCheck = findViewById(R.id.toolbar_check);
         mBackArrow = findViewById(R.id.toolbar_back_arrow);
 
+        mNoteRepository = new NoteRepository(this);
 
-
-        if (getIncomingIntent()){
+        if (getIncomingIntent()) {
             //new note (EDIT MODE)
             setNewNoteProperties();
             enabledEditMode();
@@ -66,7 +67,7 @@ public class NoteActivity extends AppCompatActivity implements View.OnTouchListe
 
     }
 
-    private void setListeners(){
+    private void setListeners() {
         mEditText.setOnTouchListener(this);
         mGestureDetector = new GestureDetector(this, this);
         mViewTitle.setOnClickListener(this);
@@ -74,8 +75,8 @@ public class NoteActivity extends AppCompatActivity implements View.OnTouchListe
         mBackArrow.setOnClickListener(this);
     }
 
-    private boolean getIncomingIntent(){
-        if (getIntent().hasExtra("selectedNote")){
+    private boolean getIncomingIntent() {
+        if (getIntent().hasExtra("selectedNote")) {
             mInitialNote = getIntent().getParcelableExtra("selectedNote");
             Log.d(TAG, "getIncomingIntent: " + mInitialNote.toString());
             mMode = EDIT_MODE_DISABLED;
@@ -87,7 +88,19 @@ public class NoteActivity extends AppCompatActivity implements View.OnTouchListe
         return true;
     }
 
-    private void disableContentInteraction(){
+    private void saveChanges() {
+        if (mIsNewNote) {
+            saveNewNote();
+        } else {
+
+        }
+    }
+
+    private void saveNewNote() {
+        mNoteRepository.insertNoteTask(mInitialNote);
+    }
+
+    private void disableContentInteraction() {
         mEditText.setKeyListener(null);
         mEditText.setFocusable(false);
         mEditText.setFocusableInTouchMode(false);
@@ -95,7 +108,7 @@ public class NoteActivity extends AppCompatActivity implements View.OnTouchListe
         mEditText.clearFocus();
     }
 
-    private void enableContentInteraction(){
+    private void enableContentInteraction() {
         mEditText.setKeyListener(new EditText(this).getKeyListener());
         mEditText.setFocusable(true);
         mEditText.setFocusableInTouchMode(true);
@@ -104,7 +117,7 @@ public class NoteActivity extends AppCompatActivity implements View.OnTouchListe
     }
 
 
-    private void enabledEditMode(){
+    private void enabledEditMode() {
         mBackArrowContainer.setVisibility(View.GONE);
         mCheckContainer.setVisibility(View.VISIBLE);
 
@@ -116,7 +129,7 @@ public class NoteActivity extends AppCompatActivity implements View.OnTouchListe
         enableContentInteraction();
     }
 
-    private void disabledEditMode(){
+    private void disabledEditMode() {
         mBackArrowContainer.setVisibility(View.VISIBLE);
         mCheckContainer.setVisibility(View.GONE);
 
@@ -127,24 +140,26 @@ public class NoteActivity extends AppCompatActivity implements View.OnTouchListe
 
         disableContentInteraction();
 
+        saveChanges();
+
     }
 
-    private void hideSoftKeyboard(){
+    private void hideSoftKeyboard() {
         InputMethodManager imm = (InputMethodManager) this.getSystemService(Activity.INPUT_METHOD_SERVICE);
         View view = this.getCurrentFocus();
-        if(view == null){
+        if (view == null) {
             view = new View(this);
         }
-        imm.hideSoftInputFromWindow(view.getWindowToken(),0);
+        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
-    private void setNoteProperties(){
+    private void setNoteProperties() {
         mViewTitle.setText(mInitialNote.getTitle());
         mEditTitle.setText(mInitialNote.getTitle());
         mEditText.setText(mInitialNote.getContent());
     }
 
-    private void setNewNoteProperties(){
+    private void setNewNoteProperties() {
         mViewTitle.setText("Note title");
         mEditTitle.setText("Note title");
     }
@@ -203,19 +218,19 @@ public class NoteActivity extends AppCompatActivity implements View.OnTouchListe
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()){
-            case R.id.toolbar_check:{
+        switch (v.getId()) {
+            case R.id.toolbar_check: {
                 hideSoftKeyboard();
                 disabledEditMode();
                 break;
             }
-            case R.id.note_text_title:{
+            case R.id.note_text_title: {
                 enabledEditMode();
                 mEditTitle.requestFocus();
                 mEditTitle.setSelection(mEditTitle.length());
                 break;
             }
-            case R.id.toolbar_back_arrow:{
+            case R.id.toolbar_back_arrow: {
                 finish();
                 break;
             }
@@ -224,9 +239,9 @@ public class NoteActivity extends AppCompatActivity implements View.OnTouchListe
 
     @Override
     public void onBackPressed() {
-        if(mMode == EDIT_MODE_ENABLED){
+        if (mMode == EDIT_MODE_ENABLED) {
             onClick(mCheck);
-        }else {
+        } else {
             super.onBackPressed();
         }
     }

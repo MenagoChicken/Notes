@@ -6,6 +6,7 @@ import androidx.lifecycle.LiveData;
 
 import java.util.List;
 
+import pl.menagochicken.async.InsertAsyncTask;
 import pl.menagochicken.models.Note;
 
 public class NoteRepository {
@@ -16,15 +17,15 @@ public class NoteRepository {
         mNoteDatabase = NoteDatabase.getInstance(context);
     }
 
-    private void insertNoteTask(Note note) {
-
+    public void insertNoteTask(Note note) {
+new InsertAsyncTask(mNoteDatabase.getNoteDao()).execute(note);
     }
 
     private void updateNote(Note note) {
 
     }
 
-    public LiveData<List<Note>> retriveNoteTask() {
+    public LiveData<List<Note>> retrieveNoteTask() {
         return mNoteDatabase.getNoteDao().getNotes();
     }
 
